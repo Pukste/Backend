@@ -16,14 +16,15 @@ namespace serverit
 
         static void Main(string[] args)
         {
-            
+            RealTimeCityBikeDataFetcher fetch = new RealTimeCityBikeDataFetcher();
             string option;
-            Console.WriteLine(args[0]);
+            //Console.WriteLine(args[0]);
             Console.WriteLine("offline or realtime?");
             option = Console.ReadLine();
             if(option == "realtime"){
-            int x = GetBikeCountInStation(Console.ReadLine());
-            Task.WaitAll();
+                Console.WriteLine("What station do you want? Petikontie");
+                Console.WriteLine(fetch.GetBikeCountInStation(Console.ReadLine()));
+                Task.WaitAll();
             }
             else if(option == "offline"){
                 // ToBeImplemented
