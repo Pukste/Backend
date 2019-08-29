@@ -1,0 +1,3 @@
+C:\Koulu\serverit\obj\Debug\netcoreapp3.0\serverit.csprojAssemblyReference.cache
+C:\Koulu\serverit\obj\Debug\netcoreapp3.0\serverit.AssemblyInfoInputs.cache
+C:\Koulu\serverit\obj\Debug\netcoreapp3.0\serverit.AssemblyInfo.cs
