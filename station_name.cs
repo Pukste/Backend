@@ -6,9 +6,7 @@ using Newtonsoft.Json;
 using System.Linq;
 
 namespace serverit
-{
-    
-    
+{  
     class Program
     {
         static void Main(string[] args)
@@ -20,8 +18,12 @@ namespace serverit
             option = Console.ReadLine();
             if(option == "realtime"){
                 Console.WriteLine("What station do you want? Petikontie");
-                Console.WriteLine(fetch.GetBikeCountInStation(Console.ReadLine()));
-                Task.WaitAll();
+                string answer = Console.ReadLine();
+                var task = fetch.GetBikeCountInStation(answer);
+                Task.WaitAll(task);
+                
+                Console.WriteLine(task.Result);
+                
             }
             else if(option == "offline"){
                 // ToBeImplemented
@@ -40,23 +42,20 @@ namespace serverit
             {
                 string uri = "http://api.digitransit.fi/routing/v1/routers/hsl/bike_rental";
                 try {
-                if(stationNAme.Any(char.IsDigit)){
-                    throw new FormatException();
-                }
-                }
-                catch (FormatException e) {
-                    Console.WriteLine("Invalid argument ", e);
-                }
-                string resp = await client.GetStringAsync(uri);
-                var stationlist = JsonConvert.DeserializeObject<RootObject>(resp).stations;
-                Console.WriteLine("ei");
-                foreach(var station in stationlist){
-                    if(station.name == stationNAme){            
-                        Console.WriteLine(station.bikesAvailable);
-                        return station.bikesAvailable;
+                    if(stationNAme.Any(char.IsDigit)){
+                        throw new FormatException();
                     }
+                
+                
+                    string resp = await client.GetStringAsync(uri);
+                    var stationlist = JsonConvert.DeserializeObject<RootObject>(resp).stations;
+                    Console.WriteLine("ei");
+                    foreach(var station in stationlist){
+                        if(station.name == stationNAme){            
+                            return station.bikesAvailable;
+                        }
 
-                }        
+                    }        
                     /*  dynamic x = JsonConvert.DeserializeObject(resp);
                         var stations = x.stations;
                         var bikes = x.bikesAvailable;
@@ -71,11 +70,17 @@ namespace serverit
 
                         }
                         }*/
-                try{             
+                             
                     throw new NotFoundExeption();
                 }
-                catch(NotFoundExeption ex){
-                    Console.WriteLine("Not Found: ", ex);
+                catch (FormatException e) {
+                    Console.WriteLine("Invalid argument "+ e);
+                }
+                catch(NotFoundExeption e){
+                    Console.WriteLine("Not Found: "+ e);
+                }
+                catch(Exception e){
+                    Console.WriteLine("Something went horribly wrong, goodbye!"+ e);
                 }
                 return -1;
             }
