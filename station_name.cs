@@ -4,88 +4,110 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Linq;
+using System.IO;
+using System.Text;
 
-namespace serverit
-{  
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            RealTimeCityBikeDataFetcher fetch = new RealTimeCityBikeDataFetcher();
+namespace serverit{  
+    class Program{
+        static void Main(string[] args){ 
             string option;
             Console.WriteLine(args[0]);
             Console.WriteLine("offline or realtime?");
             option = Console.ReadLine();
-            if(option == "realtime"){
-                Console.WriteLine("What station do you want? Petikontie");
-                string answer = Console.ReadLine();
-                var task = fetch.GetBikeCountInStation(answer);
-                Task.WaitAll(task);
-                
-                Console.WriteLine(task.Result);
-                
+            Console.WriteLine("What station do you want?");
+            string answer = Console.ReadLine();
+            try{
+                if(option == "realtime"){
+                    RealTimeCityBikeDataFetcher fetch = new RealTimeCityBikeDataFetcher();
+                    var task = fetch.GetBikeCountInStation(answer);
+                    Task.WaitAll(task);
+                    Console.WriteLine(task.Result);
+                    
+                }
+                else if(option == "offline"){
+                    OfflineCityBikeDataFetcher fetch = new OfflineCityBikeDataFetcher();
+                    var task = fetch.GetBikeCountInStation(answer);
+                    Task.WaitAll(task);
+                    Console.WriteLine(task.Result);
+                }
+                else{
+                    Console.WriteLine("Invalid Input.");
+                }
             }
-            else if(option == "offline"){
-                // ToBeImplemented
+            catch (FormatException e) {
+                Console.WriteLine("Invalid argument "+ e);
             }
-            else{
-                Console.WriteLine("Invalid Input.");
+            catch(NotFoundExeption e){
+                Console.WriteLine("Not Found: "+ e);
             }
-        }     
+            catch(Exception e){
+                Console.WriteLine("Something went horribly wrong, goodbye!"+ e);
+            }
+             
+        }
     }
 
-    public class RealTimeCityBikeDataFetcher : ICityBikeDataFetcher
-    {
+    public class RealTimeCityBikeDataFetcher : ICityBikeDataFetcher{
         static HttpClient client = new HttpClient();
-
-            public async Task<int> GetBikeCountInStation(string stationNAme)
-            {
-                string uri = "http://api.digitransit.fi/routing/v1/routers/hsl/bike_rental";
-                try {
-                    if(stationNAme.Any(char.IsDigit)){
-                        throw new FormatException();
-                    }
-                
-                
-                    string resp = await client.GetStringAsync(uri);
-                    var stationlist = JsonConvert.DeserializeObject<RootObject>(resp).stations;
-                    Console.WriteLine("ei");
-                    foreach(var station in stationlist){
-                        if(station.name == stationNAme){            
-                            return station.bikesAvailable;
-                        }
-
-                    }        
-                    /*  dynamic x = JsonConvert.DeserializeObject(resp);
-                        var stations = x.stations;
-                        var bikes = x.bikesAvailable;
-                        var name = x.name;
-                        foreach(var station in stations){
-                            Console.WriteLine(bikes, name);
-                            if(name==stationNAme){
-                                stationFound = true;
-                                returnVal= bikes;
-
-                            }
-
-                        }
-                        }*/
-                             
-                    throw new NotFoundExeption();
-                }
-                catch (FormatException e) {
-                    Console.WriteLine("Invalid argument "+ e);
-                }
-                catch(NotFoundExeption e){
-                    Console.WriteLine("Not Found: "+ e);
-                }
-                catch(Exception e){
-                    Console.WriteLine("Something went horribly wrong, goodbye!"+ e);
-                }
-                return -1;
+        public async Task<int> GetBikeCountInStation(string stationNAme)
+        {
+            string uri = "http://api.digitransit.fi/routing/v1/routers/hsl/bike_rental";
+            
+            if(stationNAme.Any(char.IsDigit)){
+                throw new FormatException();
             }
+            string resp = await client.GetStringAsync(uri);
+            var stationlist = JsonConvert.DeserializeObject<RootObject>(resp).stations;
+            Console.WriteLine("ei");
+            foreach(var station in stationlist){
+                if(station.name.ToLower() == stationNAme.ToLower()){            
+                    return station.bikesAvailable;
+                }
+            }        
+            throw new NotFoundExeption();
+            
 
-    public class Station
+            
+        }
+    }
+    public class OfflineCityBikeDataFetcher : ICityBikeDataFetcher{
+        public async Task<int> GetBikeCountInStation(string stationNAme){
+            int result = 0;
+            if(stationNAme.Any(char.IsDigit)){
+                throw new FormatException();
+            }
+            var offlineBackup = await File.ReadAllLinesAsync("bikedata.txt", Encoding.Default);
+            List<OfflineStation> offSta = new List<OfflineStation>();
+            foreach(string line in offlineBackup){
+                string[] temp = line.Split(":");
+                OfflineStation sta = new OfflineStation();
+                sta.name = temp[0].Trim();
+                sta.bikeCount = temp[1].Trim();
+                offSta.Add(sta);
+            }
+            foreach(var station in offSta){
+
+                if(station.name.ToLower() == stationNAme.ToLower()){
+                    try{
+                        result = Int32.Parse(station.bikeCount);
+                        }
+                        catch(FormatException){
+                        Console.WriteLine("offline backup corrupted");
+                    }
+                    return result;
+                }
+            }
+            throw new NotFoundExeption();
+            
+        }
+    }
+    
+
+    public class OfflineStation{
+        public string name { get; set; }
+        public string bikeCount { get; set; }
+    }
+        public class Station
     {
         public string id { get; set; }
         public string name { get; set; }
@@ -117,9 +139,9 @@ namespace serverit
     }
 
         
-    }
+    
 
-public interface ICityBikeDataFetcher {
-    Task<int> GetBikeCountInStation(string stationNAme);
-}
+    public interface ICityBikeDataFetcher {
+        Task<int> GetBikeCountInStation(string stationNAme);
+    }
 }
