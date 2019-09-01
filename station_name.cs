@@ -19,15 +19,12 @@ namespace serverit{
             try{
                 if(option == "realtime"){
                     RealTimeCityBikeDataFetcher fetch = new RealTimeCityBikeDataFetcher();
-                    var task = fetch.GetBikeCountInStation(answer);
-                    Task.WaitAll(task);
-                    Console.WriteLine(task.Result);
-                    
+                    Task<int> task = fetch.GetBikeCountInStation(answer);
+                    Console.WriteLine(task.Result);     
                 }
                 else if(option == "offline"){
                     OfflineCityBikeDataFetcher fetch = new OfflineCityBikeDataFetcher();
-                    var task = fetch.GetBikeCountInStation(answer);
-                    Task.WaitAll(task);
+                    Task<int> task = fetch.GetBikeCountInStation(answer);
                     Console.WriteLine(task.Result);
                 }
                 else{
@@ -58,16 +55,12 @@ namespace serverit{
             }
             string resp = await client.GetStringAsync(uri);
             var stationlist = JsonConvert.DeserializeObject<RootObject>(resp).stations;
-            Console.WriteLine("ei");
             foreach(var station in stationlist){
                 if(station.name.ToLower() == stationNAme.ToLower()){            
                     return station.bikesAvailable;
                 }
             }        
-            throw new NotFoundExeption();
-            
-
-            
+            throw new NotFoundExeption();    
         }
     }
     public class OfflineCityBikeDataFetcher : ICityBikeDataFetcher{
@@ -97,12 +90,10 @@ namespace serverit{
                     return result;
                 }
             }
-            throw new NotFoundExeption();
-            
+            throw new NotFoundExeption();     
         }
     }
     
-
     public class OfflineStation{
         public string name { get; set; }
         public string bikeCount { get; set; }
@@ -123,8 +114,7 @@ namespace serverit{
         public bool realTimeData { get; set; }
     }
 
-     public class RootObject
-    {
+     public class RootObject{
         public List<Station> stations { get; set; }
     }   
 
@@ -137,9 +127,6 @@ namespace serverit{
             System.Runtime.Serialization.SerializationInfo info,
             System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
-
-        
-    
 
     public interface ICityBikeDataFetcher {
         Task<int> GetBikeCountInStation(string stationNAme);
