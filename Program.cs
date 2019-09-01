@@ -9,7 +9,7 @@ using System.Text;
 
 namespace serverit{  
     class Program{
-        static void Main(string[] args){ 
+        async static Task Main(string[] args){ 
             string option;
             Console.WriteLine(args[0]);
             Console.WriteLine("offline or realtime?");
@@ -19,13 +19,13 @@ namespace serverit{
             try{
                 if(option == "realtime"){
                     RealTimeCityBikeDataFetcher fetch = new RealTimeCityBikeDataFetcher();
-                    Task<int> task = fetch.GetBikeCountInStation(answer);
-                    Console.WriteLine(task.Result);     
+                    var task = await fetch.GetBikeCountInStation(answer);
+                    Console.WriteLine(task);     
                 }
                 else if(option == "offline"){
                     OfflineCityBikeDataFetcher fetch = new OfflineCityBikeDataFetcher();
-                    Task<int> task = fetch.GetBikeCountInStation(answer);
-                    Console.WriteLine(task.Result);
+                    var task = await fetch.GetBikeCountInStation(answer);
+                    Console.WriteLine(task);
                 }
                 else{
                     Console.WriteLine("Invalid Input.");
