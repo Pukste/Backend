@@ -1,0 +1,11 @@
+c:\Koulu\serverit\Assig2\bin\Debug\netcoreapp3.0\Assig2.exe
+c:\Koulu\serverit\Assig2\bin\Debug\netcoreapp3.0\Assig2.deps.json
+c:\Koulu\serverit\Assig2\bin\Debug\netcoreapp3.0\Assig2.runtimeconfig.json
+c:\Koulu\serverit\Assig2\bin\Debug\netcoreapp3.0\Assig2.runtimeconfig.dev.json
+c:\Koulu\serverit\Assig2\bin\Debug\netcoreapp3.0\Assig2.dll
+c:\Koulu\serverit\Assig2\bin\Debug\netcoreapp3.0\Assig2.pdb
+c:\Koulu\serverit\Assig2\obj\Debug\netcoreapp3.0\Assig2.csprojAssemblyReference.cache
+c:\Koulu\serverit\Assig2\obj\Debug\netcoreapp3.0\Assig2.AssemblyInfoInputs.cache
+c:\Koulu\serverit\Assig2\obj\Debug\netcoreapp3.0\Assig2.AssemblyInfo.cs
+c:\Koulu\serverit\Assig2\obj\Debug\netcoreapp3.0\Assig2.dll
+c:\Koulu\serverit\Assig2\obj\Debug\netcoreapp3.0\Assig2.pdb
