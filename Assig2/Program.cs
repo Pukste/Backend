@@ -13,21 +13,23 @@ namespace Assig2{
             MakeNewPlayers newPlayers = new MakeNewPlayers();
             LiNQtest1 linqtest = new LiNQtest1();
             LiNQtest2 lingtest2 = new LiNQtest2();
-            Console.WriteLine(args[0]);
+            ActionTest aktion = new ActionTest();
+            //1
             newPlayers.CreateGuids();
             Player bob=players.playerlist[0];
-
+            //2
             Item item = bob.Items.returnhighersIlevel();
             Console.WriteLine("Highest Item ID is {0} and its Item Level is {1}",item.Id,item.Level);
-
+            //3
             Array getitems = linqtest.GetItems(bob);
             Array getitemswithlinq =linqtest.GetItemsWithLinq(bob);
             Console.WriteLine("GetItems lenght {0}", getitems.Length);
             Console.WriteLine("GetItemsWithLinq lenght {0}", getitemswithlinq.Length);
-
+            //4
             Console.WriteLine("Id for GetFirst {0}",lingtest2.FirstItem(bob).Id);
             Console.WriteLine("ID for GetFirstWithLinq {0}",lingtest2.FirstItemWithLinq(bob).Id);
-            
+            //5
+            aktion.ProcessEachItem(bob, aktion.PrintItem());
             Console.WriteLine("meni jo");
         }
         
@@ -46,8 +48,12 @@ namespace Assig2{
             for(int i =0; i < 1000000; i++){
                 Player p = new Player();
                 p.Id = Guid.NewGuid();
-                if(hashset.Contains(p.Id)){
-                    p.Id= Guid.NewGuid();
+                void paranoid(){
+                    if(hashset.Contains(p.Id)){
+                        p.Id= Guid.NewGuid();
+                        Console.WriteLine("Miracle has happened");
+                        paranoid();
+                    }
                 }
                 hashset.Add(p.Id);
                 p.Items = new List<Item>();
@@ -94,6 +100,18 @@ namespace Assig2{
         }
         public Item FirstItemWithLinq(Player p){
             return p.Items.First();
+        }
+    }
+
+    public class ActionTest{
+        public static void ProcessEachItem(Player player, Action<Item> process){
+            foreach(var item in player.Items){
+                process(item);
+            }
+        }
+
+        public static void PrintItem(Item item){
+            Console.WriteLine("Item ID: {0} and Item Level: {1}", item.Id, item.Level);
         }
     }
 
