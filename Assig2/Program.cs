@@ -10,6 +10,7 @@ namespace Assig2{
         static void Main(string[] args)
         {
             Players players = MakeNewPlayers.players;
+            OtherPlayers otherPlayers = CreateOtherPlayers.otherPlayers;
             MakeNewPlayers newPlayers = new MakeNewPlayers();
             LiNQtest1 linqtest = new LiNQtest1();
             LiNQtest2 lingtest2 = new LiNQtest2();
@@ -31,9 +32,24 @@ namespace Assig2{
             //5
             ActionTest.ProcessEachItem(bob, ActionTest.PrintItem);
             //6
-            // joskus
+            ActionTest.ProcessEachItem(bob, x => Console.WriteLine("Item ID: {0} and Item Level: {1}", x.Id, x.Level));
             //7
-            Console.WriteLine("meni jo");
+            Game<Player> originalGame = new Game<Player>(players.playerlist;
+            Game<PlayerForAnotherGame> ripOffGame = new Game<PlayerForAnotherGame>(otherPlayers.playerlist);
+            Player[] playertop10 = originalGame.GetTop10Players();
+            PlayerForAnotherGame[] otherPlayertop10 = ripOffGame.GetTop10Players();
+            Console.WriteLine("\n\n\nOriginal Game Leaderboards\n\n");
+            for (int i = 0; i < playertop10.Length; i++)
+            {
+                Console.WriteLine((i+1) + ". " + playertop10[i].Id + "   Score: " + playertop10[i].Score);
+            }
+            
+
+            Console.WriteLine("\n\n\nRip-Off Game Leaderboards\n\n");
+            for (int i = 0; i < otherPlayertop10.Length; i++)
+            {
+                Console.WriteLine((i + 1) + ". " + otherPlayertop10[i].Id + "   Score: " + otherPlayertop10[i].Score);
+            }
         }
         
 
@@ -47,6 +63,7 @@ namespace Assig2{
     public class MakeNewPlayers{
         public static Players players = new Players();
         public void CreateGuids(){
+            Random random = new Random();
             HashSet<Guid> hashset = new HashSet<Guid>();
             for(int i =0; i < 1000000; i++){
                 Player p = new Player();
@@ -54,6 +71,9 @@ namespace Assig2{
                 void paranoid(){
                     if(hashset.Contains(p.Id)){
                         p.Id= Guid.NewGuid();
+                        if(i<99){
+                            p.Score = random.Next(0,10000);
+                        }
                         Console.WriteLine("Miracle has happened");
                         paranoid();
                     }
@@ -77,6 +97,19 @@ namespace Assig2{
             Console.WriteLine(players.playerlist.Count);
         }
 
+    }
+
+    public class CreateOtherPlayers{
+        public static OtherPlayers otherPlayers = new OtherPlayers();
+        public void createOthers(){
+            Random random = new Random();
+            for(int i =0 ; i <100; i++){
+                PlayerForAnotherGame p = new PlayerForAnotherGame();
+                p.Id = new Guid();
+                p.Score = random.Next(0,10000);
+                otherPlayers.playerlist.Add(p);
+            }
+        }
     }
 
     public class LiNQtest1{
@@ -126,11 +159,11 @@ namespace Assig2{
             _players = players;
         }
 
-        /*public T[] GetTop10Players() {
+        public T[] GetTop10Players() {
             // ... write code that returns 10 players with highest scores
             
-            T[] => _players.OrderByDescending(x => x.Score).Take(10).ToArray();
-        }*/
+            return _players.OrderByDescending(x => x.Score).Take(10).ToArray();
+        }
 }
 
 
@@ -148,6 +181,14 @@ namespace Assig2{
         public List<Item> Items { get; set; }
     }
 
+    public class OtherPlayers{
+        public List<PlayerForAnotherGame> playerlist = new List<PlayerForAnotherGame>();
+    }
+   public class PlayerForAnotherGame : IPlayer{
+        public Guid Id { get; set; }
+        public int Score { get; set; }
+        public List<Item> Items { get; set; }
+    }
     public class Item{
         public Guid Id { get; set; }
         public int Level { get; set; }
@@ -155,13 +196,7 @@ namespace Assig2{
     
     public static class MethodExtension{
         public static Item returnhighersIlevel(this List<Item> list){
-            Item it = list[0];
-            foreach(var item in list){
-                if(item.Level > it.Level)
-                    it.Level=item.Level;
-                    
-            }
-            return it;
+            return list.OrderByDescending(o => o.Level).First();
         }  
     }
 
