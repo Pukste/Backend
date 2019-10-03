@@ -13,7 +13,7 @@ namespace Assig2{
             MakeNewPlayers newPlayers = new MakeNewPlayers();
             LiNQtest1 linqtest = new LiNQtest1();
             LiNQtest2 lingtest2 = new LiNQtest2();
-            ActionTest aktion = new ActionTest();
+            
             //1
             newPlayers.CreateGuids();
             Player bob=players.playerlist[0];
@@ -29,7 +29,10 @@ namespace Assig2{
             Console.WriteLine("Id for GetFirst {0}",lingtest2.FirstItem(bob).Id);
             Console.WriteLine("ID for GetFirstWithLinq {0}",lingtest2.FirstItemWithLinq(bob).Id);
             //5
-            aktion.ProcessEachItem(bob, aktion.PrintItem());
+            ActionTest.ProcessEachItem(bob, ActionTest.PrintItem);
+            //6
+            // joskus
+            //7
             Console.WriteLine("meni jo");
         }
         
@@ -55,6 +58,7 @@ namespace Assig2{
                         paranoid();
                     }
                 }
+                paranoid();
                 hashset.Add(p.Id);
                 p.Items = new List<Item>();
                 players.playerlist.Add(p);
@@ -114,6 +118,20 @@ namespace Assig2{
             Console.WriteLine("Item ID: {0} and Item Level: {1}", item.Id, item.Level);
         }
     }
+
+    public class Game<T> where T : IPlayer{
+        private List<T> _players;
+
+        public Game(List<T> players) {
+            _players = players;
+        }
+
+        /*public T[] GetTop10Players() {
+            // ... write code that returns 10 players with highest scores
+            
+            T[] => _players.OrderByDescending(x => x.Score).Take(10).ToArray();
+        }*/
+}
 
 
 
